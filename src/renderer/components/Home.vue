@@ -8,6 +8,7 @@
         v-model="num"
         type="number"
         class="number"
+        @keyup.enter="getMatch"
       >
     </p>
     <p>
@@ -15,9 +16,8 @@
         v-model="userResult"
         type="text"
         class="result"
-        rows="3"
-        cols="50"
-        @keyup.enter="submit"
+        @keydown.enter.prevent
+        @keyup.enter.prevent="submit"
       />
     </p>
     <button
@@ -53,6 +53,9 @@ export default {
       num: 10,
     };
   },
+  mounted() {
+    this.getMatch();
+  },
   methods: {
     getMatch() {
       let out = '';
@@ -66,13 +69,88 @@ export default {
       this.currentMatchStr = out;
     },
     submit() {
-      const num = this.currentMatchStr.length;
-      let i = 0;
-      for (; i < num; i += 1) {
-        if (this.userResult[i] !== this.currentMatchStr[i]) break;
-      }
-      if (this.currentMatchStr !== this.userResult) {
-        this.tipText = `ex: ${this.currentMatchStr}<br>in: ${this.userResult}<br>in: ${this.currentMatchStr.slice(0, i)}`;
+      if (this.tipText === '' && this.currentMatchStr === '') return;
+
+      const inputStr = this.userResult;
+      if (this.currentMatchStr !== inputStr) {
+        let errorOutput = '';
+        let rightOutput = '';
+        for (let i = 0, j = 0; i < this.currentMatchStr.length || j < inputStr.length;) {
+          const rightChar = this.currentMatchStr[i];
+          const userChar = inputStr[j];
+          if (!rightChar) {
+            errorOutput += inputStr[j];
+            j += 1;
+          } else if (!userChar) {
+            rightOutput += this.currentMatchStr[i];
+            i += 1;
+          } else if (userChar !== rightChar) {
+            let isBehindMatch = false; // 少打一个字符，当前字符与后面的匹配
+            let matchIndex = i + 1;
+            for (; matchIndex < this.currentMatchStr.length; matchIndex += 1) {
+              if (this.currentMatchStr[matchIndex] === userChar) {
+                isBehindMatch = true;
+                break;
+              }
+            }
+
+            if (isBehindMatch) {
+              errorOutput += '<span style="visibility: hidden;">';
+
+              while (i < matchIndex) {
+                errorOutput += this.currentMatchStr[i];
+                rightOutput += this.currentMatchStr[i];
+                i += 1;
+              }
+              errorOutput += '</span>';
+
+              rightOutput += this.currentMatchStr[i];
+              errorOutput += userChar; // userChar 即 this.currentMatchStr[i => matchIndex]
+            } else {
+              let isFrontMatch = false; // 多打一个字符，后面的字符与当前正确字匹配
+              let matchIndex = j + 1;
+              for (; matchIndex < this.userResult.length; matchIndex += 1) {
+                if (this.userResult[matchIndex] === rightChar) {
+                  isFrontMatch = true;
+                  break;
+                }
+              }
+
+              if (isFrontMatch) {
+                rightOutput += '<span style="visibility: hidden;">';
+
+                while (j < matchIndex) {
+                  rightOutput += this.userResult[j];
+                  errorOutput += this.userResult[j];
+                  j += 1;
+                }
+                rightOutput += '</span>';
+
+                errorOutput += this.userResult[j];
+                rightOutput += rightChar; // rightChar 即 this.userResult[j => matchIndex]
+              } else {
+                const highlightStart = ' <span style="color: teal;">';
+                const highlightEnd = '</span> ';
+                errorOutput += highlightStart;
+                rightOutput += highlightStart;
+                errorOutput += userChar;
+                rightOutput += rightChar;
+                errorOutput += highlightEnd;
+                rightOutput += highlightEnd;
+              }
+            }
+            i += 1;
+            j += 1;
+          } else {
+            errorOutput += userChar;
+            rightOutput += rightChar;
+            i += 1;
+            j += 1;
+          }
+        }
+
+        this.tipText = `right: ${rightOutput}<br>`
+        + `error: ${errorOutput}<br>`;
       } else {
         this.tipText = '√';
       }
@@ -85,6 +163,10 @@ export default {
     padding: 50px 50px;
 
     .result {
+      width: 200px;
+      height: 30px;
+      resize:none;
+
       &:focus {
         outline: none;
       }
