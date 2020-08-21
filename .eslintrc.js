@@ -2,20 +2,23 @@ module.exports = {
   root: true,
   parserOptions: {
     parser: 'babel-eslint',
-    sourceType: 'module'
+    sourceType: 'module',
   },
   env: {
     browser: true,
-    node: true
+    node: true,
   },
-  extends: 'airbnb-base',
+  extends: [
+    'airbnb-base',
+    'plugin:vue/vue3-recommended',
+  ],
   globals: {
-    __static: true
+    __static: true,
   },
   plugins: [
-    'html'
+    'html',
   ],
-  'rules': {
+  rules: {
     'global-require': 0,
     'import/no-unresolved': 0,
     'no-param-reassign': 0,
@@ -24,6 +27,6 @@ module.exports = {
     'import/newline-after-import': 0,
     'no-multi-assign': 0,
     // allow debugger during development
-    'no-debugger': process.env.NODE_ENV === 'production' ? 2 : 0
-  }
-}
+    'no-debugger': process.env.NODE_ENV === 'production' ? 2 : 0,
+  },
+};

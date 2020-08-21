@@ -1,16 +1,45 @@
 <template>
-    <section class="home_page">
-        <div class="match">
-            {{ currentMatchStr }}
-        </div>
-        <p>
-            <input type="text" class="result" v-model="userResult">
-        </p>
-        <button class="btn" @click="getMatch()">获取</button>
-        <button class="btn" @click="submit">提交</button>
-        <br><br>
-        <div class="tip_info" v-html="tipText"></div>
-    </section>
+  <section class="home_page">
+    <div class="match">
+      {{ currentMatchStr }}
+    </div>
+    <p>
+      <input
+        v-model="num"
+        type="number"
+        class="number"
+      >
+    </p>
+    <p>
+      <textarea
+        v-model="userResult"
+        type="text"
+        class="result"
+        rows="3"
+        cols="50"
+        @keyup.enter="submit"
+      />
+    </p>
+    <button
+      class="btn"
+      @click="getMatch()"
+    >
+      获取
+    </button>
+    <button
+      class="btn"
+      @click="submit"
+    >
+      提交
+    </button>
+    <br><br>
+    <!--eslint-disable vue/no-v-html -->
+    <div
+      class="tip_info"
+      v-html="tipText"
+    />
+    <!--eslint-enable vue/no-v-html -->
+  </section>
 </template>
 <script>
 export default {
@@ -21,12 +50,14 @@ export default {
       currentMatchStr: '',
       userResult: '',
       tipText: '',
+      num: 10,
     };
   },
   methods: {
-    getMatch(num = 10) {
+    getMatch() {
       let out = '';
       const strArr = [...this.strArr];
+      let { num } = this;
       while (num) {
         const random = Math.floor(Math.random() * strArr.length);
         out += strArr.splice(random, 1);
@@ -37,16 +68,26 @@ export default {
     submit() {
       const num = this.currentMatchStr.length;
       let i = 0;
-      for (; i < num; i++) {
+      for (; i < num; i += 1) {
         if (this.userResult[i] !== this.currentMatchStr[i]) break;
       }
-      this.tipText = `ex: ${this.currentMatchStr}<br>in: ${this.userResult}<br>in: ${this.currentMatchStr.slice(0, i)}`;
+      if (this.currentMatchStr !== this.userResult) {
+        this.tipText = `ex: ${this.currentMatchStr}<br>in: ${this.userResult}<br>in: ${this.currentMatchStr.slice(0, i)}`;
+      } else {
+        this.tipText = '√';
+      }
     },
   },
 };
 </script>
 <style lang="scss">
 .home_page {
-    padding: 50px 200px;
+    padding: 50px 50px;
+
+    .result {
+      &:focus {
+        outline: none;
+      }
+    }
 }
 </style>
