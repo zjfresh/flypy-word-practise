@@ -1,6 +1,6 @@
-# electron-vue
+# 小鹤音形Mac练习
 
-> An electron-vue project
+> 基于 electron-vue 开发
 
 #### Build Setup
 
