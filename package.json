@@ -1,8 +1,8 @@
 {
-  "name": "electron-vue",
+  "name": "flypy-word-practise",
   "version": "0.0.1",
   "author": "zj21 <zj21@meitu.com>",
-  "description": "An electron-vue project",
+  "description": "An flypy-word-practise project",
   "license": "MIT LICENSE",
   "main": "./dist/electron/main.js",
   "scripts": {
@@ -19,7 +19,7 @@
     "postinstall": "npm run lint:fix"
   },
   "build": {
-    "productName": "electron-vue",
+    "productName": "flypy-word-practise",
     "appId": "com.example.yourapp",
     "directories": {
       "output": "build"

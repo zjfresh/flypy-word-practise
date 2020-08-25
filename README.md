@@ -2,21 +2,25 @@
 
 > 基于 electron-vue 开发
 
+![](./static/product.png)
+
+> 输入框中修改完成后，皆可回车刷新或提交
+
 #### Build Setup
 
 ``` bash
 # install dependencies
-npm install
+yarn
 
 # serve with hot reload at localhost:9080
-npm run dev
+yarn run dev
 
 # build electron application for production
-npm run build
+yarn run build
 
 
 # lint all JS/Vue component files in `src/`
-npm run lint
+yarn run lint
 
 ```
 
