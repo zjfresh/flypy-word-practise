@@ -54,6 +54,7 @@
         type="text"
         class="result"
         @keydown.enter.prevent
+        @keydown="keydownAction"
         @keyup.enter.prevent="submit"
       />
     </p>
@@ -120,6 +121,15 @@ export default {
     this.onChange();
   },
   methods: {
+    keydownAction(e) {
+      if (e.ctrlKey || e.metaKey) {
+        if (e.keyCode === 39) {
+          this.next();
+        } else if (e.keyCode === 37) {
+          this.prev();
+        }
+      }
+    },
     splitArticle(article) {
       const strArr = [];
       for (let i = 0; i < article.length; i += 1) {
@@ -137,6 +147,7 @@ export default {
       this.currentText = text;
 
       this.userInputText = '';
+      this.tipText = '';
     },
     submit(isAutoSubmit) {
       if (this.tipText === '' && this.currentText === '') return;

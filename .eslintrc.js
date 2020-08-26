@@ -27,6 +27,7 @@ module.exports = {
     'import/newline-after-import': 0,
     'no-multi-assign': 0,
     // allow debugger during development
+    'no-console': process.env.NODE_ENV === 'production' ? 2 : 0,
     'no-debugger': process.env.NODE_ENV === 'production' ? 2 : 0,
     'vue/comment-directive': 0,
     'vue/no-v-html': 'off',
