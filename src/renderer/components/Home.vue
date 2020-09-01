@@ -132,9 +132,25 @@ export default {
     },
     splitArticle(article) {
       const strArr = [];
-      for (let i = 0; i < article.length; i += 1) {
-        if (i % this.limitNum === 0) strArr.push('');
-        strArr[strArr.length - 1] += article[i];
+      if (/\s/.test(article)) {
+        let nowStepNum = 0;
+        strArr.push('');
+        article.split(/\s/).forEach((group) => {
+          if (group.length + nowStepNum < this.limitNum) {
+            nowStepNum += group.length;
+            strArr[strArr.length - 1] += group;
+          } else {
+            strArr.push('');
+            nowStepNum = 0;
+          }
+        });
+
+        this.randomFlag = false;
+      } else {
+        for (let i = 0; i < article.length; i += 1) {
+          if (i % this.limitNum === 0) strArr.push('');
+          strArr[strArr.length - 1] += article[i];
+        }
       }
       this.articleSteps = strArr;
       this.currentStep = 1;
