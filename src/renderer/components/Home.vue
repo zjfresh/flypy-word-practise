@@ -1,7 +1,11 @@
 <template>
   <section class="home_page">
     <div class="match">
-      {{ currentText }}
+      <span
+        v-for="(char, index) in currentText"
+        :key="index"
+        :class="{is_error: userInputText.length > index && userInputText[index] !== char}"
+      >{{ char }}</span>
     </div>
     <p>
       <select
@@ -54,16 +58,20 @@
         >/{{ articleSteps && articleSteps.length || 0 }}段
       </p>
     </div>
-    <p>
+    <div>
       <textarea
         v-model="userInputText"
         type="text"
         class="result"
         @keydown.enter.prevent
         @keydown="keydownAction"
-        @keyup.enter.prevent="submit"
+        @keyup.enter.prevent="submit()"
       />
-    </p>
+      <p class="keyshortcut_tip">
+        ← ctrl + left; ctrl + right →
+      </p>
+    </div>
+    <br>
     <button
       class="btn"
       @click="prev()"
@@ -78,7 +86,7 @@
     </button>
     <button
       class="btn"
-      @click="submit"
+      @click="submit()"
     >
       提交
     </button>
@@ -227,25 +235,36 @@ export default {
 </script>
 <style lang="scss">
 .home_page {
-    padding: 50px 50px;
+  padding-top: 50px;
+  padding-left: 50px;
 
-    .article_name {
-      width: 150px;
-    }
+  .is_error {
+    color: red;
+  }
 
-    .status {
-      .current_step {
-        width: 25px;
-      }
-    }
-    .result {
-      width: 200px;
-      height: 30px;
-      resize:none;
+  .article_name {
+    width: 150px;
+  }
 
-      &:focus {
-        outline: none;
-      }
+  .status {
+    .current_step {
+      width: 25px;
     }
+  }
+  .result {
+    width: 200px;
+    height: 30px;
+    resize:none;
+
+    &:focus {
+      outline: none;
+    }
+  }
+
+  .keyshortcut_tip {
+    font-size: 12px;
+    color: #cecece;
+    margin: 0;
+  }
 }
 </style>
