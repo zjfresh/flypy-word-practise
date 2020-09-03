@@ -1,17 +1,10 @@
 <template>
   <section class="home_page">
-    <div class="match">
-      <span
-        v-for="(char, index) in currentText"
-        :key="index"
-        :class="{is_error: userInputText.length > index && userInputText[index] !== char}"
-      >{{ char }}</span>
-    </div>
     <p>
       <select
         v-model="articleName"
         class="article_name"
-        @change="onChange"
+        @change="onChange()"
       >
         <option
           v-for="(name, index) in articleKeys"
@@ -22,10 +15,10 @@
         </option>
       </select>
       <input
-        v-model="limitNum"
+        v-model.number="limitNum"
         type="number"
         class="number"
-        @keyup.enter="onChange"
+        @keyup.enter.prevent="onChange()"
       >
       <br>
       <label for="random">文章乱序</label>
@@ -40,6 +33,7 @@
         type="checkbox"
         name="random"
       >
+      <br>
       <label for="repeat">重复练习</label>
       <input
         v-model="repeatPractice"
@@ -47,16 +41,16 @@
         name="repeat"
       >
     </p>
-    <div class="status">
-      <p class="step">
-        第<input
-          v-model.number="currentStep"
-          type="number"
-          class="current_step"
-          min="1"
-          :max="articleSteps && articleSteps.length || 0"
-        >/{{ articleSteps && articleSteps.length || 0 }}段
-      </p>
+    <div class="match">
+      <span
+        v-for="(char, index) in currentText"
+        :key="index"
+        class="to_matched_char"
+        :class="{
+          is_error: userInputText.length > index && userInputText[index] !== char,
+          is_right: userInputText.length > index && userInputText[index] === char
+        }"
+      >{{ char }}</span>
     </div>
     <div>
       <textarea
@@ -69,6 +63,18 @@
       />
       <p class="keyshortcut_tip">
         ← ctrl + left; ctrl + right →
+      </p>
+    </div>
+    <br>
+    <div class="status">
+      <p class="step">
+        第<input
+          v-model.number="currentStep"
+          type="number"
+          class="current_step"
+          min="1"
+          :max="articleSteps && articleSteps.length || 0"
+        >/{{ articleSteps && articleSteps.length || 0 }}段
       </p>
     </div>
     <br>
@@ -119,6 +125,9 @@ export default {
       randomArticle: false,
       repeatPractice: true,
       articleKeys,
+      localSaveKey: [
+        'repeatPractice',
+      ],
     };
   },
   watch: {
@@ -130,6 +139,7 @@ export default {
         this.submit(true);
       }
     },
+    repeatPractice: 'saveToLocal',
   },
   mounted() {
     if (localStorage.currentArtcleName) {
@@ -137,7 +147,10 @@ export default {
     } else {
       [this.articleName] = this.articleKeys;
     }
-    this.onChange(localStorage.currentStep);
+    this.localSaveKey.forEach((key) => {
+      this[key] = localStorage[key];
+    });
+    this.onChange(+localStorage.currentStep);
   },
   methods: {
     keydownAction(e) {
@@ -205,6 +218,8 @@ export default {
           } else {
             this.next();
           }
+        } else if (this.repeatPractice) {
+          this.show();
         }
       }
     },
@@ -230,6 +245,11 @@ export default {
         this.show();
       }
     },
+    saveToLocal() {
+      this.localSaveKey.forEach((key) => {
+        if (typeof this[key] !== 'undefined')localStorage[key] = this[key];
+      });
+    },
   },
 };
 </script>
@@ -238,8 +258,17 @@ export default {
   padding-top: 50px;
   padding-left: 50px;
 
-  .is_error {
-    color: red;
+  .match {
+    margin: 20px 0;
+
+    .to_matched_char {
+    &.is_right {
+      color: teal;
+    }
+    &.is_error {
+      color: red;
+    }
+  }
   }
 
   .article_name {
@@ -248,7 +277,7 @@ export default {
 
   .status {
     .current_step {
-      width: 25px;
+      width: 35px;
     }
   }
   .result {
@@ -265,6 +294,13 @@ export default {
     font-size: 12px;
     color: #cecece;
     margin: 0;
+  }
+
+  .btn {
+    padding: 3px 10px;
+    border: solid 1px #ccc;
+    background-color: #FFF;
+    border-radius: 3px;
   }
 }
 </style>
