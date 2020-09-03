@@ -1,7 +1,11 @@
 <template>
   <section class="home_page">
     <div class="match">
-      {{ currentText }}
+      <span
+        v-for="(char, index) in currentText"
+        :key="index"
+        :class="{is_error: userInputText.length > index && userInputText[index] !== char}"
+      >{{ char }}</span>
     </div>
     <p>
       <select
@@ -45,19 +49,29 @@
     </p>
     <div class="status">
       <p class="step">
-        第{{ currentStep }}/{{ articleSteps && articleSteps.length || 0 }}段
+        第<input
+          v-model.number="currentStep"
+          type="number"
+          class="current_step"
+          min="1"
+          :max="articleSteps && articleSteps.length || 0"
+        >/{{ articleSteps && articleSteps.length || 0 }}段
       </p>
     </div>
-    <p>
+    <div>
       <textarea
         v-model="userInputText"
         type="text"
         class="result"
         @keydown.enter.prevent
         @keydown="keydownAction"
-        @keyup.enter.prevent="submit"
+        @keyup.enter.prevent="submit()"
       />
-    </p>
+      <p class="keyshortcut_tip">
+        ← ctrl + left; ctrl + right →
+      </p>
+    </div>
+    <br>
     <button
       class="btn"
       @click="prev()"
@@ -72,7 +86,7 @@
     </button>
     <button
       class="btn"
-      @click="submit"
+      @click="submit()"
     >
       提交
     </button>
@@ -109,6 +123,7 @@ export default {
   },
   watch: {
     randomArticle: 'onChange',
+    currentStep: 'show',
     randomFlag: 'show',
     userInputText(val) {
       if (val.length >= this.currentText.length) {
@@ -117,8 +132,12 @@ export default {
     },
   },
   mounted() {
-    [this.articleName] = this.articleKeys;
-    this.onChange();
+    if (localStorage.currentArtcleName) {
+      this.articleName = localStorage.currentArtcleName;
+    } else {
+      [this.articleName] = this.articleKeys;
+    }
+    this.onChange(localStorage.currentStep);
   },
   methods: {
     keydownAction(e) {
@@ -130,17 +149,36 @@ export default {
         }
       }
     },
-    splitArticle(article) {
+    splitArticle(article, step) {
       const strArr = [];
-      for (let i = 0; i < article.length; i += 1) {
-        if (i % this.limitNum === 0) strArr.push('');
-        strArr[strArr.length - 1] += article[i];
+      if (/\s/.test(article)) {
+        let nowStepNum = 0;
+        strArr.push('');
+        article.split(/\s/).forEach((group) => {
+          if (group.length + nowStepNum < this.limitNum) {
+            nowStepNum += group.length;
+            strArr[strArr.length - 1] += group;
+          } else {
+            strArr.push('');
+            nowStepNum = 0;
+          }
+        });
+
+        this.randomFlag = false;
+      } else {
+        for (let i = 0; i < article.length; i += 1) {
+          if (i % this.limitNum === 0) strArr.push('');
+          strArr[strArr.length - 1] += article[i];
+        }
       }
       this.articleSteps = strArr;
-      this.currentStep = 1;
+      this.currentStep = step || 1;
     },
     show() {
       let text = this.articleSteps[this.currentStep - 1];
+      localStorage.currentStep = this.currentStep;
+
+      if (!text) return;
       if (this.randomFlag) {
         text = randomStr(text);
       }
@@ -170,13 +208,14 @@ export default {
         }
       }
     },
-    onChange() {
+    onChange(step) {
+      localStorage.currentArtcleName = this.articleName;
       let article = getArticle(this.articleName);
       if (this.randomArticle) {
         article = randomStr(article);
       }
 
-      this.splitArticle(article);
+      this.splitArticle(article, step);
       this.show();
     },
     prev() {
@@ -196,20 +235,36 @@ export default {
 </script>
 <style lang="scss">
 .home_page {
-    padding: 50px 50px;
+  padding-top: 50px;
+  padding-left: 50px;
 
-    .article_name {
-      width: 150px;
+  .is_error {
+    color: red;
+  }
+
+  .article_name {
+    width: 150px;
+  }
+
+  .status {
+    .current_step {
+      width: 25px;
     }
+  }
+  .result {
+    width: 200px;
+    height: 30px;
+    resize:none;
 
-    .result {
-      width: 200px;
-      height: 30px;
-      resize:none;
-
-      &:focus {
-        outline: none;
-      }
+    &:focus {
+      outline: none;
     }
+  }
+
+  .keyshortcut_tip {
+    font-size: 12px;
+    color: #cecece;
+    margin: 0;
+  }
 }
 </style>

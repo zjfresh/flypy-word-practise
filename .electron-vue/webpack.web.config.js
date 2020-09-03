@@ -102,6 +102,8 @@ let webConfig = {
         removeAttributeQuotes: true,
         removeComments: true
       },
+      // https://github.com/SimulatedGREG/electron-vue/pull/1020
+      // package.json build.mac."target":"pkg"
       templateParameters(compilation, assets, options) {
         return {
           compilation: compilation,
