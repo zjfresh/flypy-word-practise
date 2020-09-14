@@ -148,7 +148,7 @@ export default {
       [this.articleName] = this.articleKeys;
     }
     this.localSaveKey.forEach((key) => {
-      this[key] = localStorage[key];
+      this[key] = this.revertToValue(localStorage[key]);
     });
     this.onChange(+localStorage.currentStep);
   },
@@ -230,7 +230,7 @@ export default {
         article = randomStr(article);
       }
 
-      this.splitArticle(article, step);
+      this.splitArticle(article, typeof step === 'number' ? step : 0);
       this.show();
     },
     prev() {
@@ -249,6 +249,26 @@ export default {
       this.localSaveKey.forEach((key) => {
         if (typeof this[key] !== 'undefined')localStorage[key] = this[key];
       });
+    },
+    revertToValue(str) {
+      switch (str) {
+        case 'true':
+          return true;
+        case 'false':
+          return false;
+        default:
+          if (!Number.isNaN(+str)) {
+            return +str;
+          } else if (/^[\\{\\[]/.test(str) && /[\\}\]]$/.test(str)) {
+            try {
+              return JSON.parse(str);
+            } catch (err) {
+              window.console.error(err);
+              return str;
+            }
+          }
+          return str;
+      }
     },
   },
 };
