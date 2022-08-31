@@ -11,6 +11,8 @@
 ``` bash
 # install dependencies
 yarn
+nvm exec 14.5.0 npm i
+nvm exec 14.5.0 npm run build
 
 # serve with hot reload at localhost:9080
 yarn run dev
