@@ -28,35 +28,6 @@ function createWindow() {
   mainWindow.on('closed', () => {
     mainWindow = null;
   });
-
-  let willQuitApp = false; // 控制退出方式
-
-  mainWindow.on('close', (e) => {
-    // console.log('createWindow -> willQuitApp', willQuitApp);
-    if (willQuitApp) {
-      mainWindow = null;
-    } else { // mac平台，左上角关闭窗口 = 隐藏窗口
-      e.preventDefault();
-      mainWindow.hide();
-    }
-  });
-  mainWindow.on('show', () => {
-    // console.log('createWindow -> show', willQuitApp);
-    mainWindow.show();
-  });
-
-  // Quit when all windows are closed.
-  app.on('window-all-closed', () => {
-    // 在 macOS 上，除非用户用 Cmd + Q 确定地退出，
-    // 否则绝大部分应用及其菜单栏会保持激活。
-    if (process.platform !== 'darwin') {
-      app.quit();
-    }
-  });
-
-  app.on('before-quit', () => {
-    willQuitApp = true;
-  });
 }
 
 app.on('ready', createWindow);
