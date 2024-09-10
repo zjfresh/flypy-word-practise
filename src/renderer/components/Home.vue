@@ -29,7 +29,7 @@
       >
       <label for="random">组乱序</label>
       <input
-        v-model="randomFlag"
+        v-model="randomGroup"
         type="checkbox"
         name="random"
       >
@@ -121,19 +121,18 @@ export default {
       tipText: '',
       limitNum: 10,
       articleName: '',
-      randomFlag: true,
+      randomGroup: true,
       randomArticle: false,
       repeatPractice: true,
       articleKeys,
-      localSaveKey: [
-        'repeatPractice',
-      ],
+      localSaveKey: ['repeatPractice'],
+      groupMap: [],
     };
   },
   watch: {
     randomArticle: 'onChange',
     currentStep: 'show',
-    randomFlag: 'show',
+    randomGroup: 'show',
     userInputText(val) {
       if (val.length >= this.currentText.length) {
         this.submit(true);
@@ -168,16 +167,15 @@ export default {
         let nowStepNum = 0;
         strArr.push('');
         article.split(/\s/).forEach((group) => {
-          if (group.length + nowStepNum < this.limitNum) {
-            nowStepNum += group.length;
-            strArr[strArr.length - 1] += group;
-          } else {
+          if (group.length + nowStepNum >= this.limitNum) {
             strArr.push('');
             nowStepNum = 0;
           }
+          nowStepNum += group.length;
+          strArr[strArr.length - 1] += group;
         });
 
-        this.randomFlag = false;
+        this.randomGroup = false;
       } else {
         for (let i = 0; i < article.length; i += 1) {
           if (i % this.limitNum === 0) strArr.push('');
@@ -192,8 +190,8 @@ export default {
       localStorage.currentStep = this.currentStep;
 
       if (!text) return;
-      if (this.randomFlag) {
-        text = randomStr(text);
+      if (this.randomGroup) {
+        text = randomStr(text, this.groupMap);
       }
       this.currentText = text;
 
@@ -226,8 +224,11 @@ export default {
     onChange(step) {
       localStorage.currentArtcleName = this.articleName;
       let article = getArticle(this.articleName);
+      if (/\s/.test(article)) {
+        this.groupMap = article.split(/\s/g).filter(s => s !== '——');
+      }
       if (this.randomArticle) {
-        article = randomStr(article);
+        article = randomStr(article, this.groupMap);
       }
 
       this.splitArticle(article, typeof step === 'number' ? step : 0);
@@ -247,7 +248,7 @@ export default {
     },
     saveToLocal() {
       this.localSaveKey.forEach((key) => {
-        if (typeof this[key] !== 'undefined')localStorage[key] = this[key];
+        if (typeof this[key] !== 'undefined') localStorage[key] = this[key];
       });
     },
     revertToValue(str) {
@@ -282,13 +283,13 @@ export default {
     margin: 20px 0;
 
     .to_matched_char {
-    &.is_right {
-      color: teal;
+      &.is_right {
+        color: teal;
+      }
+      &.is_error {
+        color: red;
+      }
     }
-    &.is_error {
-      color: red;
-    }
-  }
   }
 
   .article_name {
@@ -303,7 +304,7 @@ export default {
   .result {
     width: 200px;
     height: 30px;
-    resize:none;
+    resize: none;
 
     &:focus {
       outline: none;
@@ -319,7 +320,7 @@ export default {
   .btn {
     padding: 3px 10px;
     border: solid 1px #ccc;
-    background-color: #FFF;
+    background-color: #fff;
     border-radius: 3px;
   }
 }

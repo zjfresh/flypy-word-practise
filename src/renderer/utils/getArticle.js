@@ -4,5 +4,5 @@ export const articleKeys = Object.keys(articleMap);
 
 
 export function getArticle(articleName) {
-  return articleMap[articleName];
+  return articleMap[articleName] || '';
 }

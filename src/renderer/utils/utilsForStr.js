@@ -1,10 +1,25 @@
-export function randomStr(article) {
+export function randomStr(article, groupMap) {
   let str = '';
-  const randomNumArr = Array.from({ length: article.length }, (_, index) => index);
-  while (randomNumArr.length) {
-    const randomIndex = Math.floor(Math.random() * randomNumArr.length);
-    str += article[randomNumArr.splice(randomIndex, 1)];
+  let articleArr = [];
+
+  groupMap.forEach((groupStr) => {
+    if (article.includes(groupStr)) {
+      articleArr.push(groupStr);
+    }
+  });
+
+
+  articleArr = articleArr.concat(article
+    .split(new RegExp(articleArr.join('|')))
+    .join('')
+    .split(''));
+
+  const randomGroupNumArr = Array.from({ length: articleArr.length }, (_, index) => index);
+  while (randomGroupNumArr.length) {
+    const randomIndex = Math.floor(Math.random() * randomGroupNumArr.length);
+    str += articleArr[randomGroupNumArr.splice(randomIndex, 1)];
   }
+
   return str;
 }
 
