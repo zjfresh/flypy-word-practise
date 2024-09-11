@@ -8,11 +8,9 @@ export function randomStr(article, groupMap) {
     }
   });
 
-
+  const matchedGroupReg = new RegExp(articleArr.join('|'));
   articleArr = articleArr.concat(article
-    .split(new RegExp(articleArr.join('|')))
-    .join('')
-    .split(''));
+    .split(matchedGroupReg).filter(s => Boolean(s.trim()) && s.trim() !== '——'));
 
   const randomGroupNumArr = Array.from({ length: articleArr.length }, (_, index) => index);
   while (randomGroupNumArr.length) {
