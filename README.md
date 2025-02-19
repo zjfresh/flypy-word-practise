@@ -14,6 +14,25 @@ yarn
 nvm exec 14.5.0 npm i
 nvm exec 14.5.0 npm run build
 
+# Mac M1
+PYTHON_PATH=/usr/bin/python3 nvm exec 14.5.0 npm run build
+
+# hotfix
+# node_modules/dmg-builder/vendor/dmgbuild/core.py
+```py
+# +++
+try:
+    reload
+except NameError:
+    from importlib import reload
+# ---
+
+reload(sys)  # Reload is a hack
+-sys.setdefaultencoding('UTF8')
++# sys.setdefaultencoding('UTF8')
+```
+
+
 # serve with hot reload at localhost:9080
 yarn run dev
 
