@@ -6,7 +6,7 @@
   "license": "MIT LICENSE",
   "main": "./dist/electron/main.js",
   "scripts": {
-    "build": "node .electron-vue/build.js && electron-builder",
+    "build": "node .electron-vue/build.js && PYTHON_PATH=/usr/bin/python3 electron-builder",
     "build:v14.5.0": "unset npm_lifecycle_script && unset npm_config_prefix && source $NVM_DIR/nvm.sh;nvm exec 14.5.0 npm run build;",
     "build:win": "node .electron-vue/build.js && electron-builder build --win",
     "build:dir": "node .electron-vue/build.js && electron-builder --dir",
