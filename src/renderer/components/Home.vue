@@ -47,8 +47,10 @@
         :key="index"
         class="to_matched_char"
         :class="{
-          is_error: userInputText.length > index && userInputText[index] !== char,
-          is_right: userInputText.length > index && userInputText[index] === char
+          is_error:
+            userInputText.length > index && userInputText[index] !== char,
+          is_right:
+            userInputText.length > index && userInputText[index] === char,
         }"
       >{{ char }}</span>
     </div>
@@ -73,8 +75,8 @@
           type="number"
           class="current_step"
           min="1"
-          :max="articleSteps && articleSteps.length || 0"
-        >/{{ articleSteps && articleSteps.length || 0 }}段
+          :max="(articleSteps && articleSteps.length) || 0"
+        >/{{ (articleSteps && articleSteps.length) || 0 }}段
       </p>
     </div>
     <br>
@@ -167,9 +169,14 @@ export default {
         let nowStepNum = 0;
         strArr.push('');
         article.split(/\s/).forEach((group) => {
+          // 下一组内容跟当前分组内容长度之和大于限制长度时，添加下一个分组
           if (group.length + nowStepNum >= this.limitNum) {
-            strArr.push('');
-            nowStepNum = 0;
+            if (strArr[strArr.length - 1] !== '') {
+              strArr.push('');
+              nowStepNum = 0;
+            } else {
+              this.limitNum = group.length;
+            }
           }
           nowStepNum += group.length;
           strArr[strArr.length - 1] += group;
@@ -204,10 +211,13 @@ export default {
       const inputStr = this.userInputText;
       const toMatchedStr = this.currentText;
       if (toMatchedStr !== inputStr) {
-        const { rightOutput, errorOutput } = findDifferent(toMatchedStr, inputStr);
+        const { rightOutput, errorOutput } = findDifferent(
+          toMatchedStr,
+          inputStr,
+        );
 
-        this.tipText = `right: ${rightOutput}<br>`
-        + `error: ${errorOutput}<br>`;
+        this.tipText =
+          `right: ${rightOutput}<br>error: ${errorOutput}<br>`;
       } else {
         this.tipText = '√';
         if (!isAutoSubmit) {
